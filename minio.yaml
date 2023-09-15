@@ -1,39 +1,29 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: minio
-  name: minio
-  namespace: demo
+  name: minio-deployment
 spec:
-  containers:
-  - name: minio
-    image: quay.io/minio/minio:latest
-    command:
-    - /bin/bash
-    - -c
-    args: 
-    - minio server /data --console-address :9090
-    volumeMounts:
-    - mountPath: /data
-      name: persistent-storage
-  volumes:
-  - name: persistent-storage
-    persistentVolumeClaim:
-      claimName: efs-claim
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: minio
-  namespace: demo
-spec:
+  replicas: 1
   selector:
-    app: minio
-  ports:
-    - port: 9090
-      name: console
-    - port: 9000
-      name: s3
-  type: ClusterIP
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: minio/minio:latest
+        args:
+        - server
+        - /data
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: minio-storage
+          mountPath: /data
+      volumes:
+      - name: minio-storage
+        persistentVolumeClaim:
+          claimName: minio-pvc
