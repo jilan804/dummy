@@ -5,10 +5,13 @@ metadata:
 spec:
   strategy:
     type: Recreate
+  selector:
+    matchLabels:
+      app: minio  
   template:
     metadata:
       labels:
-        app: minio
+        app: minio   
     spec:
       volumes:
       - name: storage
