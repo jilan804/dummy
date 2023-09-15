@@ -1,47 +1,27 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: minio
-  namespace: demo
   labels:
     app: minio
+  name: minio
+  namespace: demo
 spec:
-  replicas: 1
-  template:
-    metadata:
-      name: minio
-      labels:
-        app: minio
-    spec:
-      containers:
-        - name: minio
-          image: quay.io/minio/minio:latest
-          imagePullPolicy: IfNotPresent
-          command:
-          - /bin/bash
-          - -c
-          args:
-          - minio server /data --console-address :9090
-          volumeMounts:
-          - name: persistent-storage
-            mountPath: /data
-          resources:
-            requests:
-              memory: "1000Mi"
-              cpu: "1000m"
-            limits:
-              memory: "1500Mi"
-              cpu: "1500m"
-      volumes:
-      - name: persistent-storage
-        persistentVolumeClaim:
-        claimName: efs-claim
-        path: /mnt/disk1/data
-        type: DirectoryOrCreate 
-      restartPolicy: Always    
-  selector:
-    matchLabels:
-      app: minio
+  containers:
+  - name: minio
+    image: quay.io/minio/minio:latest
+    command:
+    - /bin/bash
+    - -c
+    args: 
+    - minio server /data --console-address :9090
+    volumeMounts:
+    - mountPath: /data
+      name: persistent-storage
+  volumes:
+  - name: persistent-storage
+    persistentVolumeClaim:
+      claimName: efs-claim
 ---
 apiVersion: v1
 kind: Service
