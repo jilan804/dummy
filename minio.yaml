@@ -39,6 +39,7 @@ spec:
             limits:
               memory: "1500Mi"
               cpu: "1500m"
+
           volumeMounts:
             - mountPath: /data
               name: data
